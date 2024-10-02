@@ -1,14 +1,18 @@
+# 使用 Dockerfile 语法的实验特性
 # syntax=docker/dockerfile:experimental
+
+# 基础镜像选择 Python 3.10
 FROM python:3.10
 
-# We set this environment variable and install git while building to try and
-# increase the stability of fetching the rust crates needed to build the
-# cryptography library
+# 设置环境变量 CARGO_NET_GIT_FETCH_WITH_CLI 为 true
+# 这是为了在构建 cryptography 库时增加稳定性，因为它依赖一些 Rust crates
 ARG CARGO_NET_GIT_FETCH_WITH_CLI=true
 
-
+# 切换到 root 用户，并执行以下命令
 RUN set -ex \
+    # 删除 apt 的源列表目录
     && rm -rf /etc/apt/sources.list.d \
+    # 添加华为云的 Debian 软件源地址
     && echo 'deb https://mirrors.huaweicloud.com/debian/ bookworm main non-free non-free-firmware contrib' > /etc/apt/sources.list \
     && echo 'deb-src https://mirrors.huaweicloud.com/debian/ bookworm main non-free contrib' >> /etc/apt/sources.list \
     && echo 'deb https://mirrors.huaweicloud.com/debian-security bookworm-security main' >> /etc/apt/sources.list \
@@ -18,11 +22,13 @@ RUN set -ex \
     && echo 'deb https://mirrors.huaweicloud.com/debian/ bookworm-backports main non-free contrib' >> /etc/apt/sources.list \
     && echo 'deb-src https://mirrors.huaweicloud.com/debian/ bookworm-backports main non-free contrib' >> /etc/apt/sources.list
 
+# 创建 pip 配置目录，并设置 pip 使用北京大学的镜像源
 RUN set -ex \
  && mkdir /root/.pip \
  && echo '[global]' > /root/.pip/pip.conf \
  && echo 'index-url = https://mirrors.bfsu.edu.cn/pypi/web/simple/' >> /root/.pip/pip.conf
 
+# 更新 apt 包列表，并安装一些必要的构建工具和依赖
 RUN apt-get update && apt-get install -y \
   pkg-config \
   patchelf \
@@ -38,9 +44,13 @@ RUN apt-get update && apt-get install -y \
   git \
   --no-install-recommends
 
+# 升级 pip 和 setuptools
 RUN pip install --upgrade pip setuptools
-# https://github.com/rust-lang/cargo/issues/8719
+
+# 由于 Rust 的一个已知问题，使用 tmpfs 挂载来加速构建过程
+# 安装特定版本的 cryptography 库
 RUN --mount=type=tmpfs,target=/root/.cargo \
     pip3 install --no-cache-dir cryptography==39.0.2
-RUN pip install --upgrade poetry
 
+# 安装 poetry 包管理工具并升级到最新版本
+RUN pip install --upgrade poetry
