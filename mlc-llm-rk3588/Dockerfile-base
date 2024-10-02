@@ -1,38 +1,50 @@
+# 从 scratch 镜像开始，添加 libmali 库
 FROM scratch AS git-libmali
+# 从指定的 GitHub 仓库添加 libmali 库
 ADD https://github.com/JeffyCN/mirrors.git#libmali /
 
 # --------------------------------------------------------------------------- #
 
+# 从 scratch 镜像开始，添加 mlc-llm 库
 FROM scratch AS git-mlc-llm
+# 从指定的 GitHub 仓库添加 mlc-llm 库
 ADD https://github.com/mlc-ai/mlc-llm.git /
 
 # --------------------------------------------------------------------------- #
 
+# 从 scratch 镜像开始，提取 libmali 驱动文件
 FROM scratch as libmali-driver
+# 从 git-libmali 阶段复制 libmali 驱动文件到根目录
 COPY --from=git-libmali /lib/aarch64-linux-gnu/libmali-valhall-g610-*.so /
 
 # --------------------------------------------------------------------------- #
 
+# 从 scratch 镜像开始，提取 libmali 固件文件
 FROM scratch AS libmali-firmware
+# 从 git-libmali 阶段复制 libmali 固件文件到根目录
 COPY --from=git-libmali /firmware/g610/mali_csffw.bin /
 
 # --------------------------------------------------------------------------- #
 
+# 使用 Alpine Linux 作为基础镜像来获取必要的工具
 FROM alpine AS fetch
+# 安装 git 和 git-lfs
 RUN apk add --no-cache \
     git \
     git-lfs \
     ;
 
+# 使用空镜像（scratch）作为基础镜像来添加二进制文件
 FROM scratch AS git-binary-mlc-llm-libs
+# 从指定的 GitHub 仓库添加二进制文件
 ADD https://github.com/mlc-ai/binary-mlc-llm-libs.git /
-
 
 # --------------------------------------------------------------------------- #
 
+# 使用 Debian Bookworm 作为基础镜像来安装 OpenCL 相关的依赖
 FROM debian:bookworm AS opencl
 
-# based on https://mlc.ai/mlc-llm/docs/install/gpu.html#orange-pi-5-rk3588-based-sbc
+# 根据 https://mlc.ai/mlc-llm/docs/install/gpu.html#orange-pi-5-rk3588-based-sbc 安装 OpenCL 相关依赖
 RUN apt-get update \
     && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
         mesa-opencl-icd \
@@ -47,20 +59,27 @@ RUN apt-get update \
         python3-pip \
     ;
 
+# 创建 OpenCL 供应商目录并添加 mali 的 ICD 文件
 RUN mkdir -p /etc/OpenCL/vendors \
     && echo "/usr/lib/libmali-valhall-g610-g6p0-x11-wayland-gbm.so" | tee /etc/OpenCL/vendors/mali.icd \
     ;
 
+# 从 libmali-firmware 阶段复制固件文件
 COPY --from=libmali-firmware / /lib/firmware/
+# 从 libmali-driver 阶段复制驱动文件
 COPY --from=libmali-driver / /usr/lib/
+# 运行 ldconfig 以更新链接和缓存
 RUN ldconfig
 
+# 设置默认命令为 clinfo
 CMD ["clinfo"]
 
 # --------------------------------------------------------------------------- #
 
+# 使用 Debian Bookworm 作为基础镜像来构建 mlc-llm
 FROM debian:bookworm AS build
 
+# 更新包列表并安装构建所需的依赖
 RUN apt-get update \
     && DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
         build-essential \
@@ -70,14 +89,15 @@ RUN apt-get update \
         python3 \
     ;
 
-# install rust
+# 安装 Rust 编译器
 ENV PATH="/root/.cargo/bin:${PATH}"
 RUN curl https://sh.rustup.rs -sSf | bash -s -- -y
 
+# 复制 mlc-llm 源代码和配置文件
 COPY --from=git-mlc-llm / /mlc-llm
 COPY ./mlc-llm-rk3588/config.cmake /mlc-llm/build/
 
-# based on https://blog.mlc.ai/2023/08/09/GPU-Accelerated-LLM-on-Orange-Pi
+# 根据 https://blog.mlc.ai/2023/08/09/GPU-Accelerated-LLM-on-Orange-Pi 构建 mlc-llm
 RUN cd /mlc-llm/build \
     && cmake .. \
     && cmake --build . --parallel $(nproc) \
@@ -86,18 +106,23 @@ RUN cd /mlc-llm/build \
 
 # --------------------------------------------------------------------------- #
 
+# 使用 opencl 镜像作为基础镜像
 FROM opencl
 
+# 安装 Python 包
 RUN pip3 install numpy torch transformers scipy timm \
     gradio fastapi uvicorn shortuuid \
     --break-system-packages
 
+# 创建 mlc-llm 的 Python 目录并复制构建输出和 Python 模块
 RUN mkdir -p /mlc-llm/python/
 COPY --from=build /out/bin/ /out/lib/ /mlc-llm/build/
 COPY --from=git-mlc-llm /3rdparty/tvm/python/tvm/ /mlc-llm/python/tvm/
 COPY --from=git-mlc-llm /python/mlc_chat/ /mlc-llm/python/mlc_chat/
 COPY --from=git-mlc-llm /mlc_llm /mlc-llm/python/mlc_llm/
 
+# 设置环境变量
 ENV LD_LIBRARY_PATH=/mlc-llm/build/
 ENV PYTHONPATH=/mlc-llm/python/
+# 设置工作目录
 WORKDIR /mlc-llm
