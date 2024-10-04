@@ -40,7 +40,7 @@ FROM fetch AS fetch-model
 # 使用构建参数 MODEL_LOCAL_ID
 ARG MODEL_LOCAL_ID
 # 定义 Git 仓库的 URL
-ARG GIT_URL="https://huggingface.co/mlc-ai/${MODEL_LOCAL_ID}.git"
+ARG GIT_URL="https://huggingface.co/mlc-ai/${MODEL_LOCAL_ID}"
 # 创建缓存目录并克隆指定的 Git 仓库
 RUN mkdir -p /cache/${MODEL_LOCAL_ID}/ \
     && git clone \
