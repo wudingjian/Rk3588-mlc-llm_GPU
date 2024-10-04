@@ -9,6 +9,7 @@ ADD https://github.com/JeffyCN/mirrors.git#libmali /
 FROM scratch AS git-mlc-llm
 # 从指定的 GitHub 仓库添加 mlc-llm 库
 ADD https://github.com/mlc-ai/mlc-llm.git /
+RUN ls -R /repo
 
 # --------------------------------------------------------------------------- #
 
