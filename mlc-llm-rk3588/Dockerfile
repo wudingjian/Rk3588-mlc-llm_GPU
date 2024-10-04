@@ -18,6 +18,7 @@ RUN apk add --no-cache \
     git \
     git-lfs \
     ;
+RUN git lfs install
 
 # 使用空镜像（scratch）作为基础镜像来添加二进制文件
 FROM scratch AS git-binary-mlc-llm-libs
@@ -42,11 +43,11 @@ ARG MODEL_LOCAL_ID
 # 定义 Git 仓库的 URL
 ARG GIT_URL="https://huggingface.co/mlc-ai/${MODEL_LOCAL_ID}"
 # 创建缓存目录并克隆指定的 Git 仓库
-RUN git lfs install
+
 RUN mkdir -p /cache/${MODEL_LOCAL_ID}/ \
     && git clone \
-      --single-branch --depth 1 \
-      --separate-git-dir=/cache/${MODEL_LOCAL_ID}/git \
+      # --single-branch --depth 1 \
+      # --separate-git-dir=/cache/${MODEL_LOCAL_ID}/git \
       ${GIT_URL} \
       /out/${MODEL_LOCAL_ID} \
     ;
