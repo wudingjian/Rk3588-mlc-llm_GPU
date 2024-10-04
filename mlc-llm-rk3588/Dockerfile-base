@@ -114,9 +114,9 @@ RUN pip3 install numpy torch transformers scipy timm \
     gradio fastapi uvicorn shortuuid \
     --break-system-packages
 
-# 创建 mlc-llm 的 Python 目录并复制构建输出和 Python 模块
+# 创建 mlc-llm 的 Python 目录并复制构建输出和 Python 模块 /out/bin/
 RUN mkdir -p /mlc-llm/python/
-COPY --from=build /out/bin/ /out/lib/ /mlc-llm/build/
+COPY --from=build /out/lib/ /mlc-llm/build/
 COPY --from=git-mlc-llm /3rdparty/tvm/python/tvm/ /mlc-llm/python/tvm/
 # COPY --from=git-mlc-llm /python/mlc_chat/ /mlc-llm/python/mlc_chat/
 COPY --from=git-mlc-llm /python/mlc_llm /mlc-llm/python/mlc_llm/
