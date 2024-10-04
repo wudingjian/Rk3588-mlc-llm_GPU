@@ -32,7 +32,7 @@ FROM scratch AS binary-mlc-llm-lib
 # 使用构建参数 MODEL
 ARG MODEL
 # 从之前的阶段复制模型的二进制库文件到根目录
-COPY --from=git-binary-mlc-llm-libs /${MODEL}-mali.so /
+COPY --from=git-binary-mlc-llm-libs /Qwen-1_8B-Chat/*.so /
 
 # --------------------------------------------------------------------------- #
 
