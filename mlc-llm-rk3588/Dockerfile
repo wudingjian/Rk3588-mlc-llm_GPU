@@ -40,6 +40,7 @@ COPY --from=git-binary-mlc-llm-libs /${MODEL}-mali.so /
 FROM fetch AS fetch-model
 # 使用构建参数 MODEL_LOCAL_ID
 ARG MODEL_LOCAL_ID
+RUN git lfs install
 # 定义 Git 仓库的 URL
 ARG GIT_URL="https://huggingface.co/mlc-ai/${MODEL_LOCAL_ID}"
 # 创建缓存目录并克隆指定的 Git 仓库
