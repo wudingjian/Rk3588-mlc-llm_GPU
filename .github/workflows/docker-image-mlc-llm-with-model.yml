@@ -37,4 +37,4 @@ jobs:  # 定义作业
           file: mlc-llm-rk3588/Dockerfile  # 指定 Dockerfile 的路径
           push: true  # 构建完成后推送镜像
           platforms: linux/arm64  # 指定目标平台
-          tags: vicalloy/mlc-llm-rk3588:${{ github.event.inputs.model-local-id }}  # 指定镜像的标签，使用手动触发时提供的 model-local-id 参数
+          tags: jsntwdj/mlc-llm-rk3588:${{ github.event.inputs.model-local-id }}  # 指定镜像的标签，使用手动触发时提供的 model-local-id 参数
