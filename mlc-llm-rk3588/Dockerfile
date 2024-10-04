@@ -51,7 +51,7 @@ RUN mkdir -p /cache/Qwen2.5-3B-Instruct-q4f16_1-MLC/ \
       # --separate-git-dir=/cache/${MODEL_LOCAL_ID}/git \
       # ${GIT_URL} \
       # /out/${MODEL_LOCAL_ID} \
-    ;
+    # ;
 
 # --------------------------------------------------------------------------- #
 
