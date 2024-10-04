@@ -45,8 +45,8 @@ RUN git lfs install
 ARG GIT_URL="https://huggingface.co/mlc-ai/${MODEL_LOCAL_ID}"
 # 创建缓存目录并克隆指定的 Git 仓库
 
-RUN mkdir -p /cache/${MODEL_LOCAL_ID}/ \
-    && git clone ${GIT_URL} /out/${MODEL_LOCAL_ID}
+RUN mkdir -p /cache/Qwen2.5-3B-Instruct-q4f16_1-MLC/ \
+    && git clone https://huggingface.co/mlc-ai/Qwen2.5-3B-Instruct-q4f16_1-MLC /out/Qwen2.5-3B-Instruct-q4f16_1-MLC
       # --single-branch --depth 1 \
       # --separate-git-dir=/cache/${MODEL_LOCAL_ID}/git \
       # ${GIT_URL} \
