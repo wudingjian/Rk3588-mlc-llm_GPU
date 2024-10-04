@@ -1,4 +1,4 @@
-name: Build vicalloy/mlc-llm-rk3588:base  # 定义 GitHub Actions 工作流程的名称
+name: Build jsntwdj/mlc-llm-rk3588:base  # 定义 GitHub Actions 工作流程的名称
 
 on:  # 指定触发工作流程的条件
   push:  # 当推送代码时触发
