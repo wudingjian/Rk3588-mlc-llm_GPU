@@ -9,7 +9,6 @@ ADD https://github.com/JeffyCN/mirrors.git#libmali /
 FROM scratch AS git-mlc-llm
 # 从指定的 GitHub 仓库添加 mlc-llm 库
 ADD https://github.com/mlc-ai/mlc-llm.git /
-RUN ls -R /repo
 
 # --------------------------------------------------------------------------- #
 
@@ -119,7 +118,7 @@ RUN pip3 install numpy torch transformers scipy timm \
 RUN mkdir -p /mlc-llm/python/
 COPY --from=build /out/bin/ /out/lib/ /mlc-llm/build/
 COPY --from=git-mlc-llm /3rdparty/tvm/python/tvm/ /mlc-llm/python/tvm/
-COPY --from=git-mlc-llm /python/mlc_chat/ /mlc-llm/python/mlc_chat/
+# COPY --from=git-mlc-llm /python/mlc_chat/ /mlc-llm/python/mlc_chat/
 COPY --from=git-mlc-llm /python/mlc_llm /mlc-llm/python/mlc_llm/
 
 # 设置环境变量
