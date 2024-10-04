@@ -119,7 +119,7 @@ RUN mkdir -p /mlc-llm/python/
 COPY --from=build /out/bin/ /out/lib/ /mlc-llm/build/
 COPY --from=git-mlc-llm /3rdparty/tvm/python/tvm/ /mlc-llm/python/tvm/
 COPY --from=git-mlc-llm /python/mlc_chat/ /mlc-llm/python/mlc_chat/
-COPY --from=git-mlc-llm /mlc_llm /mlc-llm/python/mlc_llm/
+COPY --from=git-mlc-llm /python/mlc_llm /mlc-llm/python/mlc_llm/
 
 # 设置环境变量
 ENV LD_LIBRARY_PATH=/mlc-llm/build/
