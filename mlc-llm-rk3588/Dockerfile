@@ -46,7 +46,7 @@ RUN mkdir -p /cache/${MODEL_LOCAL_ID}/ \
     && git clone \
       --single-branch --depth 1 \
       --separate-git-dir=/cache/${MODEL_LOCAL_ID}/git \
-      https://huggingface.co/mlc-ai/Qwen2.5-3B-Instruct-q4f16_1-MLC.git \
+      https://huggingface.co/mlc-ai/Qwen2.5-3B-Instruct-q4f16_1-MLC \
       /out/${MODEL_LOCAL_ID} \
     ;
 
