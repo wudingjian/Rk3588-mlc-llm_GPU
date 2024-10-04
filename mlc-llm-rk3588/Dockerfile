@@ -44,7 +44,7 @@ ARG GIT_URL="https://huggingface.co/mlc-ai/${MODEL_LOCAL_ID}"
 # 创建缓存目录并克隆指定的 Git 仓库
 RUN mkdir -p /cache/${MODEL_LOCAL_ID}/ \
     && git clone \
-      --single-branch --depth 1 \
+      # --single-branch --depth 1 \
       --separate-git-dir=/cache/${MODEL_LOCAL_ID}/git \
       ${GIT_URL} \
       /out/${MODEL_LOCAL_ID} \
